@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Lista de cosas activas</title>
+    <style>
+      body {
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  text-align: center;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+form label {
+  display: block;
+  margin-bottom: 5px;
+  margin-left:50px;
+  margin-right:50px
+}
+
+form input[type="text"] {
+  width: 90%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  margin-left: 50px;
+  margin-right: 50px;
+}
+
+form button {
+  padding: 20px;
+  background-color: #0066cc;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 625px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px;
+}
+
+li {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+li button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 5px;
+  background-color: #cc0000;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+    </style>
+</head>
+<body>
+  <h1> Agregar equipos para prestamo </h1>
+
+  <form>
+    <label for="nombre">Salón:</label>
+    <input type="text" id="nombre" name="nombre" required>
+
+    <label for="descripcion">Equipos:</label>
+    <input type="text" id="descripcion" name="descripcion" required>
+
+    <label for="nombrepersona">Nombre Persona:</label>
+    <input type="text" id="nombrepersona" name="nombrepersona" required>
+
+<br>
+    <button id="agregar" type="button">Agregar</button>
+  </form>
+
+  <h1> Equipos en prestamo </h1>
+
+  <ul id="lista"></ul>
+
+  <script>
+    const lista = document.getElementById('lista');
+    const agregarBoton = document.getElementById('agregar');
+
+    // Cargar elementos guardados en localStorage
+    const datosActivos = JSON.parse(localStorage.getItem('datosActivos')) || [];
+    for (const datoActivo of datosActivos) {
+      const nuevoElemento = crearNuevoElemento(datoActivo.nombre, datoActivo.descripcion, datoActivo.nombrepersona);
+      lista.appendChild(nuevoElemento);
+    }
+
+    agregarBoton.addEventListener('click', () => {
+      const nombre = document.getElementById('nombre').value;
+      const descripcion = document.getElementById('descripcion').value;
+	const nombrepersona = document.getElementById('nombrepersona').value;
+      
+      const nuevoElemento = crearNuevoElemento(nombre, descripcion, nombrepersona);
+      lista.appendChild(nuevoElemento);
+
+      // Guardar el elemento en localStorage
+      const datosActivos = JSON.parse(localStorage.getItem('datosActivos')) || [];
+      const nuevosDatosActivos = [...datosActivos, { nombre, descripcion, nombrepersona }];
+      localStorage.setItem('datosActivos', JSON.stringify(nuevosDatosActivos));
+
+      // Limpiar los campos de entrada
+      document.getElementById('nombre').value = '';
+      document.getElementById('descripcion').value = '';
+    });
+	document.getElementById('nombrepersona').value = '';
+
+    function crearNuevoElemento(nombre, descripcion, nombrepersona) {
+      const nuevoElemento = document.createElement('li');
+      const texto = document.createTextNode(`${nombre}: ${descripcion}: ${nombrepersona}`);
+      nuevoElemento.appendChild(texto);
+
+      const botonEliminar = document.createElement('button');
+      botonEliminar.textContent = 'Eliminar permanentemente';
+      nuevoElemento.appendChild(botonEliminar);
+
+      botonEliminar.addEventListener('click', () => {
+        nuevoElemento.remove();
+
+        // Eliminar los datos del elemento de lista de localStorage
+        const datosActivos = JSON.parse(localStorage.getItem('datosActivos')) || [];
+        const nuevosDatosActivos = datosActivos.filter(datoActivo => datoActivo.nombre !== nombre || datoActivo.descripcion !== descripcion);
+        localStorage.setItem('datosActivos', JSON.stringify(nuevosDatosActivos));
+      });
+
+      return nuevoElemento;
+    }
+  </script>
+</body>
+</html>
